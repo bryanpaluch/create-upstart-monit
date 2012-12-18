@@ -1,0 +1,27 @@
+{
+  "name": "upstart-then-monit",
+  "version": "0.0.0",
+  "description": "Creates upstart and monit files for deploying services",
+  "main": "server.js",
+  "dependencies": {
+    "commander": "~1.1.1",
+    "swig": "~0.13.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/bryanpaluch/upstart-then-monit.git"
+  },
+  "keywords": [
+    "upstart",
+    "monit",
+    "nodejs",
+    "generator"
+  ],
+  "bin" : { "create-upstart-monit": "./bin/create-upstart-monit.js"},
+  "author": "Bryan Paluch",
+  "license": "MIT"
+}
