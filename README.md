@@ -5,9 +5,10 @@ applications
 install globally using
 
 ```javascript
+
 npm install create-upstart-monit
 
-``
+```
 
 Then go to the application you want to generate upstart and monit files
 for and type create-upstart-monit -p 3000
