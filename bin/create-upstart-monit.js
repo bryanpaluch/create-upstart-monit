@@ -15,7 +15,7 @@ program
   .option('-u, --user [user]', 'The user for which the process should run as defaults to ubuntu')
   .parse(process.argv);
 
-console.log('Upstart then Monit file generator for nodejs');
+console.log('Upstart and Monit file generator for nodejs');
 if (!program.port){
   console.log('Port required aborting');
   process.exit(1); 
@@ -26,8 +26,8 @@ if (!program.user) program.user = 'ubuntu';
 if (!program.homedir) program.homedir = '/home/ubuntu';
 
 var info = require(process.cwd() + '/package.json');
-console.log(info);
 if(!info.description || !info.main || !info.name || !info.author){
+  console.log(info);
   console.log('missing item in package.json aborting');
   console.log('description, main, name and author required'); 
   process.exit(1);
@@ -67,7 +67,6 @@ var upopts = {
 	     }
 var uptpl = swig.compile(upstart);
 var upstartFile = uptpl(upopts);
-console.log(upstartFile);
 //-----------------------------------------
 
 
