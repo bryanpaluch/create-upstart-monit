@@ -24,7 +24,7 @@ monit file written to /.deployscripts/xbeecloudcordinator.monit.conf
 You can then move them over to /etc/init/ and /etc/monit/conf.d/
 yourself.
 
-```javascript
+```
 ubuntu@hostname:/opt/home-monitor/cloud-cordinator$ sudo cp
 .deployscripts/xbeecloudcordinator.conf /etc/init/
 ubuntu@hostname:/opt/home-monitor/cloud-cordinator$ sudo cp
@@ -33,8 +33,8 @@ ubuntu@hostname:/opt/home-monitor/cloud-cordinator$ sudo cp
 
 Then you start your service with something like
 
-```javascript
-start xbeecloudcordinator
+```
+ubuntu@hostname:/opt/$sudo start xbeecloudcordinator
 
 ```
 
