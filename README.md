@@ -12,7 +12,7 @@ npm install create-upstart-monit
 
 Then go to the application you want to generate upstart and monit files
 
-```javascript
+```
 ubuntu@hostname:/opt$ cd home-monitor/cloud-cordinator/
 ubuntu@hostname:/opt/home-monitor/cloud-cordinator$
 create-upstart-monit -p 3003
