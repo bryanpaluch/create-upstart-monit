@@ -16,8 +16,10 @@ Then go to the application you want to generate upstart and monit files
 ubuntu@hostname:/opt$ cd home-monitor/cloud-cordinator/
 ubuntu@hostname:/opt/home-monitor/cloud-cordinator$ create-upstart-monit -p 3003
 upstart file written to
-/opt/home-monitor/cloud-cordinator/.deployscripts/xbeecloudcordinator.conf monit file written to
-/opt/home-monitor/cloud-cordinator/.deployscripts/xbeecloudcordinator.monit.confUpstart and Monit file generator for nodejs
+/opt/home-monitor/cloud-cordinator/.deployscripts/xbeecloudcordinator.conf 
+monit file written to
+/opt/home-monitor/cloud-cordinator/.deployscripts/xbeecloudcordinator.monit.conf
+Upstart and Monit file generator for nodejs
 ```
 
 You can then move them over to /etc/init/ and /etc/monit/conf.d/
