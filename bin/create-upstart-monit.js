@@ -78,7 +78,7 @@ if(!(fs.existsSync(process.cwd() + '/.deployscripts/')) && !abort){
 }
 var upfd = fs.openSync(process.cwd() + '/.deployscripts/' + upopts.appname + '.conf', 'w+')
 fs.writeSync(upfd,upstartFile);
-console.log('upstart file written to /.deployscripts/' + upopts.appname + '.conf');
+console.log('upstart file written to ' + process.cwd() + '/.deployscripts/' + upopts.appname + '.conf');
 
 //-----------------Done Upstart File
 //----------------- monit template
@@ -106,4 +106,4 @@ var montpl = swig.compile(monit);
 var monstartFile = montpl(monopts);
 var monfd = fs.openSync(process.cwd() + '/.deployscripts/' + monopts.appname + '.monit.conf', 'w+')
 fs.writeSync(monfd,monstartFile);
-console.log('monit file written to /.deployscripts/' + monopts.appname + '.monit.conf');
+console.log('monit file written to ' + process.cwd() + '/.deployscripts/' + monopts.appname + '.monit.conf');

@@ -2,11 +2,11 @@
 
 Create upstart and monit configuration files for your nodejs
 applications
-install globally using
+install globally using you may need sudo
 
 ```javascript
 
-npm install create-upstart-monit
+npm install create-upstart-monit -g
 
 ```
 
@@ -15,9 +15,9 @@ Then go to the application you want to generate upstart and monit files
 ```
 ubuntu@hostname:/opt$ cd home-monitor/cloud-cordinator/
 ubuntu@hostname:/opt/home-monitor/cloud-cordinator$ create-upstart-monit -p 3003
-Upstart and Monit file generator for nodejs
-upstart file written to /.deployscripts/xbeecloudcordinator.conf
-monit file written to /.deployscripts/xbeecloudcordinator.monit.conf
+upstart file written to
+/opt/home-monitor/cloud-cordinator/.deployscripts/xbeecloudcordinator.conf monit file written to
+/opt/home-monitor/cloud-cordinator/.deployscripts/xbeecloudcordinator.monit.confUpstart and Monit file generator for nodejs
 ```
 
 You can then move them over to /etc/init/ and /etc/monit/conf.d/
