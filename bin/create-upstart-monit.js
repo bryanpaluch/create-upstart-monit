@@ -7,6 +7,8 @@
 var program = require('commander');
 var swig = require('swig');
 var fs = require('fs');
+var execSync = require('execSync');
+
 var abort = false;
 program
   .version('0.0.1')
@@ -21,7 +23,9 @@ if (!program.port){
   process.exit(1); 
   abort = true;
 }
-
+var nodeloc = execSync.stdout('which node');
+nodeloc = nodeloc.replace(/[\n\r]/g, '');
+console.log(nodeloc);
 if (!program.user) program.user = 'ubuntu';
 if (!program.homedir) program.homedir = '/home/ubuntu';
 
@@ -44,7 +48,7 @@ var upstart = [
 ,"script"
 ,"	export HOME=\"{{home}}\""
 ,"	chdir {{workingdir}}"	
-,"	exec start-stop-daemon --chdir {{workingdir}} --start --make-pidfile --pidfile /var/run/{{appname}}.pid --chuid $USER --exec /usr/bin/node {{workingdir}}/{{appexec}} >> /var/log/{{appname}}.log 2>&1"
+,"	exec start-stop-daemon --chdir {{workingdir}} --start --make-pidfile --pidfile /var/run/{{appname}}.pid --chuid $USER --exec {{nodeloc}} {{workingdir}}/{{appexec}} >> /var/log/{{appname}}.log 2>&1"
 ,"end script"
 
 ,"pre-start script"
@@ -63,7 +67,8 @@ var upopts = {
 		user: program.user,
 		workingdir: process.cwd(),
 		appname: info.name,
-		appexec: info.main
+		appexec: info.main,
+    nodeloc: nodeloc
 	     }
 var uptpl = swig.compile(upstart);
 var upstartFile = uptpl(upopts);
