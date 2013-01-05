@@ -1,12 +1,11 @@
 {
   "name": "create-upstart-monit",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Creates upstart and monit files for deploying services",
   "main": "server.js",
   "dependencies": {
     "commander": "~1.1.1",
-    "swig": "~0.13.3",
-    "execSync": "0.0.1"
+    "swig": "~0.13.3"
   },
   "devDependencies": {},
   "scripts": {

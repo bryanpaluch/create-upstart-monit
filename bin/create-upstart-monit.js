@@ -7,8 +7,7 @@
 var program = require('commander');
 var swig = require('swig');
 var fs = require('fs');
-var execSync = require('execSync');
-
+var exec = require('child_process').exec;
 var abort = false;
 program
   .version('0.0.1')
@@ -23,9 +22,6 @@ if (!program.port){
   process.exit(1); 
   abort = true;
 }
-var nodeloc = execSync.stdout('which node');
-nodeloc = nodeloc.replace(/[\n\r]/g, '');
-console.log('using node location ' + nodeloc);
 if (!program.user) program.user = 'ubuntu';
 if (!program.homedir) program.homedir = '/home/ubuntu';
 
@@ -38,66 +34,85 @@ if(!info.description || !info.main || !info.name || !info.author){
 }
 var eol ="\n";
 
-//----------------------Upstart Template
-var upstart = [
-"description \"{{description}}\""
-,"author \"{{author}}\""
-,"env USER={{user}}"
-,"start on runlevel [2345]"
-,"stop on runlevel [!2345]"
-,"script"
-,"	export HOME=\"{{home}}\""
-,"	chdir {{workingdir}}"	
-,"	exec start-stop-daemon --chdir {{workingdir}} --start --make-pidfile --pidfile /var/run/{{appname}}.pid --chuid $USER --exec {{nodeloc}} {{workingdir}}/{{appexec}} >> /var/log/{{appname}}.log 2>&1"
-,"end script"
+var nodeloc;
+var child = exec('which node', function(error, stdout, stderr){
+  if(error !== null){
+    console.log('problem getting node path, is node in your path?');
+    process.exit(1);
+  }
+  nodeloc = stdout;
+  nodeloc = nodeloc.replace(/[\n\r]/g, '');
+  if(nodeloc){
+    console.log('using node location ' + nodeloc);
+    start();
+  }
+  else{
+    console.log('no nodelocation, is node in your path?');
+    process.exit(1);
+  }
+});
 
-,"pre-start script"
-,"	echo \"[`date -u +%Y-%m-%dT%T.%3NZ`] (sys) Starting\" >> /var/log/{{appname}}.log"
-,"end script"
-,"pre-stop script"
-,"	echo \"[`date -u +%Y-%m-%dT%T.%3NZ`] (sys) Stopping\" >> /var/log/{{appname}}.log"
-,"end script"
-].join(eol);
-//------------------------ End Upstart Template
-//----------------------- Send template values
-var upopts = {  
-		description : info.description,
-		author: info.author,
-		home: program.homedir,
-		user: program.user,
-		workingdir: process.cwd(),
-		appname: info.name,
-		appexec: info.main,
-    nodeloc: nodeloc
-	     }
-var uptpl = swig.compile(upstart);
-var upstartFile = uptpl(upopts);
-//-----------------------------------------
+function start(){
+  //----------------------Upstart Template
+  var upstart = [
+  "description \"{{description}}\""
+  ,"author \"{{author}}\""
+  ,"env USER={{user}}"
+  ,"start on runlevel [2345]"
+  ,"stop on runlevel [!2345]"
+  ,"script"
+  ,"	export HOME=\"{{home}}\""
+  ,"	chdir {{workingdir}}"	
+  ,"	exec start-stop-daemon --chdir {{workingdir}} --start --make-pidfile --pidfile /var/run/{{appname}}.pid --chuid $USER --exec {{nodeloc}} {{workingdir}}/{{appexec}} >> /var/log/{{appname}}.log 2>&1"
+  ,"end script"
+
+  ,"pre-start script"
+  ,"	echo \"[`date -u +%Y-%m-%dT%T.%3NZ`] (sys) Starting\" >> /var/log/{{appname}}.log"
+  ,"end script"
+  ,"pre-stop script"
+  ,"	echo \"[`date -u +%Y-%m-%dT%T.%3NZ`] (sys) Stopping\" >> /var/log/{{appname}}.log"
+  ,"end script"
+  ].join(eol);
+  //------------------------ End Upstart Template
+  //----------------------- Send template values
+  var upopts = {  
+      description : info.description,
+      author: info.author,
+      home: program.homedir,
+      user: program.user,
+      workingdir: process.cwd(),
+      appname: info.name,
+      appexec: info.main,
+      nodeloc: nodeloc
+         }
+  var uptpl = swig.compile(upstart);
+  var upstartFile = uptpl(upopts);
+  //-----------------------------------------
 
 
 
-//----------------Create Upstart file
-if(!(fs.existsSync(process.cwd() + '/.deployscripts/')) && !abort){
-  console.log('creating deploy scripts directory'); 
-  fs.mkdirSync(process.cwd() + '/.deployscripts');
-}
-var upfd = fs.openSync(process.cwd() + '/.deployscripts/' + upopts.appname + '.conf', 'w+')
-fs.writeSync(upfd,upstartFile);
-console.log('upstart file written to ' + process.cwd() + '/.deployscripts/' + upopts.appname + '.conf');
+  //----------------Create Upstart file
+  if(!(fs.existsSync(process.cwd() + '/.deployscripts/')) && !abort){
+    console.log('creating deploy scripts directory'); 
+    fs.mkdirSync(process.cwd() + '/.deployscripts');
+  }
+  var upfd = fs.openSync(process.cwd() + '/.deployscripts/' + upopts.appname + '.conf', 'w+')
+  fs.writeSync(upfd,upstartFile);
+  console.log('upstart file written to ' + process.cwd() + '/.deployscripts/' + upopts.appname + '.conf');
 
-//-----------------Done Upstart File
-//----------------- monit template
-var monit = [
-,"  #!monit"
-,"  check process {{appname}} with pidfile \"/var/run/{{appname}}.pid\""
-,"    start program = \"/sbin/start {{appname}}\""
-,"      stop program = \"/sbin/stop {{appname}}\""
-,"        if failed port {{port}} protocol HTTP"
-,"              request /"
-,"                  with timeout 10 seconds"
-,"                then restart"
-].join(eol);
-var monopts = {
+  //-----------------Done Upstart File
+  //----------------- monit template
+  var monit = [
+  ,"  #!monit"
+  ,"  check process {{appname}} with pidfile \"/var/run/{{appname}}.pid\""
+  ,"    start program = \"/sbin/start {{appname}}\""
+  ,"      stop program = \"/sbin/stop {{appname}}\""
+  ,"        if failed port {{port}} protocol HTTP"
+  ,"              request /"
+  ,"                  with timeout 10 seconds"
+  ,"                then restart"
+  ].join(eol);
+  var monopts = {
 		description : info.description,
 		author: info.author,
 		home: program.homedir,
@@ -107,8 +122,9 @@ var monopts = {
 		appexec: info.main,
     port: program.port,
 	     }
-var montpl = swig.compile(monit);
-var monstartFile = montpl(monopts);
-var monfd = fs.openSync(process.cwd() + '/.deployscripts/' + monopts.appname + '.monit.conf', 'w+')
-fs.writeSync(monfd,monstartFile);
-console.log('monit file written to ' + process.cwd() + '/.deployscripts/' + monopts.appname + '.monit.conf');
+  var montpl = swig.compile(monit);
+  var monstartFile = montpl(monopts);
+  var monfd = fs.openSync(process.cwd() + '/.deployscripts/' + monopts.appname + '.monit.conf', 'w+')
+  fs.writeSync(monfd,monstartFile);
+  console.log('monit file written to ' + process.cwd() + '/.deployscripts/' + monopts.appname + '.monit.conf');
+}
