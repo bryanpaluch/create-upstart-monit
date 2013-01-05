@@ -25,7 +25,7 @@ if (!program.port){
 }
 var nodeloc = execSync.stdout('which node');
 nodeloc = nodeloc.replace(/[\n\r]/g, '');
-console.log(nodeloc);
+console.log('using node location ' + nodeloc);
 if (!program.user) program.user = 'ubuntu';
 if (!program.homedir) program.homedir = '/home/ubuntu';
 
